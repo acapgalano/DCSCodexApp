@@ -20,16 +20,17 @@ from rest_framework import serializers # Serializers - converts JSON to python o
 class RegisterUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'groups']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = User.objects.create(
             username=validated_data['username'],
-            email=validated_data['email']
+            email=validated_data['email'],
         )
         user.set_password(validated_data['password'])
         user.save() # Creates new user object to be registered into the system
+        user.groups.set(validated_data['groups'])
         return user
 
 # Entry Serializer unserializes requests for the list of entries 
@@ -38,3 +39,24 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry 
         fields = ['date','name', 'info', 'group']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'groups')
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name', 'users')
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'groups')
+
+    def update(self, instance, validated_data):
+        instance.id = validated_data.get('id', instance.id)
+        instance.save()
+        instance.groups.set(validated_data['groups'])
+        return instance

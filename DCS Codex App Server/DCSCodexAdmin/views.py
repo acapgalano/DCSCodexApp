@@ -16,9 +16,11 @@ Code History:
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
 from .models import User, Group, Entry
-from .serializers import RegisterUserSerializer, EntrySerializer
+from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, UserUpdateSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView
+from django.shortcuts import get_object_or_404
 
 # RegisterUser view used for account registration
 class RegisterUser(CreateAPIView):
@@ -28,3 +30,21 @@ class RegisterUser(CreateAPIView):
 class EntryList(ListAPIView):
     queryset = Entry.objects.all()
     serializer_class = EntrySerializer
+
+class UserList(ListAPIView):
+	queryset = User.objects.all()
+	serializer_class = UserSerializer
+
+class GroupList(ListAPIView):
+	queryset = Group.objects.all()
+	serializer_class = GroupSerializer
+
+class UserUpdate(generics.RetrieveUpdateAPIView):
+	serializer_class = UserUpdateSerializer
+
+	def get_object(self):
+		id = self.kwargs['id']
+		return get_object_or_404(User, id=id)
+	
+	def put(self, request, *args, **kwargs):
+		return self.update(request, *args, **kwargs)
