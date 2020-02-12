@@ -12,7 +12,7 @@ Code History:
 1/30 - RegisteredUserSerializer 
 1/31 - EntrySerializer
 '''
-
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Group, Entry
 from rest_framework import serializers # Serializers - converts JSON to python object and vice-versa
 
@@ -50,13 +50,29 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = ('id', 'name', 'users')
 
+class GroupsSerializer(serializers.ModelSerializer): # nested serialization for Group.name as String in UserUpdateSerializer
+    class Meta:
+        model = Group
+        fields = ('name',)
+
 class UserUpdateSerializer(serializers.ModelSerializer):
+    #groups = serializers.StringRelatedField(many=True) # Display subscriptions of user as string 
+    groups = GroupsSerializer(many=True)
     class Meta:
         model = User
         fields = ('id', 'email', 'groups')
 
     def update(self, instance, validated_data):
+        #instance.id = validated_data.get('id', instance.id)
+        #instance.save()
+        #instance.groups.set(validated_data['groups'])
         instance.id = validated_data.get('id', instance.id)
+        temp = []
+        for group in validated_data['groups']:
+            print(group['name'])
+            temp.append(Group.objects.get(name=group['name'])) # looks for id of Group.name to be saved to User instance
         instance.save()
-        instance.groups.set(validated_data['groups'])
+        instance.groups.set(temp)
         return instance
+
+        

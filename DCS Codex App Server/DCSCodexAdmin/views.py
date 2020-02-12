@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from .models import User, Group, Entry
-from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, UserUpdateSerializer
+from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView
 from django.shortcuts import get_object_or_404
 
@@ -37,7 +37,11 @@ class UserList(ListAPIView):
 
 class GroupList(ListAPIView):
 	queryset = Group.objects.all()
-	serializer_class = GroupSerializer
+	serializer_class = GroupsSerializer
+
+class AddGroupList(ListAPIView):
+	queryset = Group.objects.exclude(users=2)
+	serializer_class = GroupsSerializer
 
 class UserUpdate(generics.RetrieveUpdateAPIView):
 	serializer_class = UserUpdateSerializer
