@@ -2,7 +2,7 @@
 This is a course requirement for CS 192 Software Engineering II under the supervision of Asst. Prof. Ma. Rowena C. Solamo 
 of the Department of Computer Science, College of Engineering, University of the Philippines, Diliman for the AY 2019-2020.
 
-Author: Anica Galano - 2016-01120 
+Author: Anica Galano - 2016-01120 and Ken Tabagan - 2017-00897
 File Created: 1/31/2020
 Development Group: CS 192 Group 5 
 Client Group: CS 192 Group 5
@@ -11,6 +11,8 @@ Purpose of the Software: To provide mobile access of the DCS Codex with the feat
 Code History:
 1/30 - RegisteredUserSerializer 
 1/31 - EntrySerializer
+2/08 - UserSerializer, GroupSerializer, UserUpdateSerializer
+2/10 - Updated UserUpdateSerializer, GroupsSerializer
 '''
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Group, Entry
@@ -39,12 +41,12 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry 
         fields = ['date','name', 'info', 'group']
-
+# User Serializer to serialize User data
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'email', 'groups')
-
+#Group Serializer to serialize Group Data
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
@@ -55,6 +57,7 @@ class GroupsSerializer(serializers.ModelSerializer): # nested serialization for 
         model = Group
         fields = ('name',)
 
+#Unserializes requests for update on user information (particularly subscriptions)
 class UserUpdateSerializer(serializers.ModelSerializer):
     #groups = serializers.StringRelatedField(many=True) # Display subscriptions of user as string 
     groups = GroupsSerializer(many=True)
