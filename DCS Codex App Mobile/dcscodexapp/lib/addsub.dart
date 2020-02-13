@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dcscodexapp/group.dart';
 import 'package:http/http.dart' as http;
 import 'package:dcscodexapp/sublist.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SubscriptionPost {
   final int id;
@@ -74,16 +76,24 @@ class AddSubscriptionRouteState extends State<AddSubscriptionRoute> {
   }
 
   Future<List<Group>> fetchGroups() async {
+    var response;
     if (groups == null || updateGroup == true) {
-      final response = await http.get('http://10.0.2.2:8000/addgroup');
+      try {
+        print("Will await.");
+        response = await http.get('http://10.0.2.2:8000/addgroup').timeout(const Duration(seconds: 2));
+      } on TimeoutException catch (_){
+        print("Timeout.");
+        Fluttertoast.showToast(msg: "Error: Failed to connect to server.");
+      } on SocketException catch (_) {
+        print("SocketException while putting.");
+        Fluttertoast.showToast(msg: "Error: Failed to reach server.");
+      }
       if (response.statusCode == 200) {
         print("Add Sub, Get GroupList: Success!");
         var responseJson = json.decode(response.body);
         groups = (responseJson as List).map((p) => Group.fromJson(p)).toList();
         _values = groups.map((a) => false).toList();
         return groups;
-      } else {
-        throw Exception('Failed to load post');
       }
     } else {
       return groups;
@@ -120,11 +130,10 @@ class AddSubscriptionRouteState extends State<AddSubscriptionRoute> {
       if (_values[i] == true) {
         temp.add(groups[i].name);
       }
-      print(temp);
     }
     String json = jsonEncode(SubscriptionPost(id: 2, email: 'testuser@test.com', groups: temp));
     print(json);
-    _makePutRequest(json);
+    await _makePutRequest(json);
   }
 
   @override
@@ -146,9 +155,12 @@ class AddSubscriptionRouteState extends State<AddSubscriptionRoute> {
           Align(
             alignment: Alignment.bottomCenter,
             child: RaisedButton(
-              onPressed: () {
-                _notNameless();
-                Navigator.of(context).pop();
+              onPressed: () async {
+                await _notNameless();
+                print("hello");
+                Navigator.of(context).pop(() {
+                  setState(() {});
+                });
               },
               child: const Text('Add Subscriptions', style: TextStyle(fontSize: 20)),
               color: Colors.blue,

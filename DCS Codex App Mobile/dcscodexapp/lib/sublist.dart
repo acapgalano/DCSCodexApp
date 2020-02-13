@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dcscodexapp/addsub.dart';
 import 'package:dcscodexapp/group.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SubscriptionPost {
   final int id;
@@ -40,30 +42,40 @@ class SubscriptionListRouteState extends State<SubscriptionListRoute> {
   Future<SubscriptionPost> post;
 
   Future<SubscriptionPost> fetchSubscriptions() async {
-    final response = await http.get('http://10.0.2.2:8000/update/2');
-
+    var response;
+    try {
+      print("Will await.");
+      response = await http.get('http://10.0.2.2:8000/update/2').timeout(const Duration(seconds: 2));
+    } on TimeoutException catch (_){
+      print("Timeout.");
+      Fluttertoast.showToast(msg: "Failed to connect to server.");
+    } on SocketException catch(_){
+      print("SocketException while putting.");
+      Fluttertoast.showToast(msg: "Error: Failed to reach server.");
+    }
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response, then parse the JSON.
-      //List <dynamic> body = jsonDecode(response.body);
-      //List <SubscriptionPost> posts = body
-      //.map((dynamic item) => SubscriptionPost.fromJson(item),).toList();
       print("Success!");
       return SubscriptionPost.fromJson(json.decode(response.body));
-    } else {
-      // If the server did not return a 200 OK response, then throw an exception.
-      throw Exception('Failed to load post');
     }
   }
 
   _makePutRequest(String json) async {
-
+    var response;
     // set up PUT request arguments
     String url = 'http://10.0.2.2:8000/update/2';
     Map<String, String> headers = {"Content-type": "application/json"};
 
     // make PUT request
-    final response = await http.put(url, headers: headers, body: json);
-
+    try {
+      print("Will await.");
+      response = await http.put(url, headers: headers, body: json).timeout(const Duration(seconds: 2));
+    } on TimeoutException catch (_){
+      print("Timeout while putting.");
+      Fluttertoast.showToast(msg: "Error: Failed to reach server.");
+    } on SocketException catch(_) {
+      print("SocketException while putting.");
+      Fluttertoast.showToast(msg: "Error: Failed to reach server.");
+    }
     // check the status code for the result
     int statusCode = response.statusCode;
 
@@ -96,11 +108,7 @@ class SubscriptionListRouteState extends State<SubscriptionListRoute> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddSubscriptionRoute()),
-          ).then((onValue){
-            setState(() {
-              
-            });
-          });
+          );
         },
       ),
     );
@@ -129,7 +137,7 @@ class SubscriptionListRouteState extends State<SubscriptionListRoute> {
                             FlatButton(
                               child: Text('Cancel'),
                               onPressed: () {
-                                Navigator.of(context).pop();
+                                Navigator.of(context).pop(context);
                               },
                             ),
                             FlatButton(
