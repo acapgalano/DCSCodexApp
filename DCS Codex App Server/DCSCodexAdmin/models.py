@@ -33,6 +33,6 @@ class Entry(models.Model):
      group = models.ForeignKey('Group', on_delete=models.CASCADE) # Each entry is related to a Group
 
 class Notification(models.Model):
-	 group = models.ForeignKey('Group', on_delete=models.CASCADE, blank=True, null=True)
+	 #group = models.ForeignKey('Group', on_delete=models.CASCADE, blank=True, null=True)
 	 info = models.TextField(max_length=250)
 	 date_to_send = models.DateTimeField()
