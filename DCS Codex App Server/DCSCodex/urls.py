@@ -19,7 +19,7 @@ from django.conf.urls import url
 from DCSCodexAdmin import views 
 from django.conf.urls import include
 from rest_framework.authtoken import views as view
-
+#admin.autodiscover()
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', views.RegisterUser.as_view(), name='register'),
@@ -28,5 +28,9 @@ urlpatterns = [
     path('groups/', views.GroupList.as_view(), name ='groups'),
     path('users/', views.UserList.as_view(), name='users'),
     path('update/<int:id>', views.UserUpdate.as_view(), name='update'),
-    path('addgroup/', views.AddGroupList.as_view(), name='addgroup')
+    path('addgroup/', views.AddGroupList.as_view(), name='addgroup'),
+    path('notifs/', views.NotificationList.as_view(), name = 'notifs'),
+    path('createnotif/', views.CreateNotification.as_view(), name = 'cnotif'),
 ]
+
+

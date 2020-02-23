@@ -15,7 +15,7 @@ Code History:
 2/10 - Updated UserUpdateSerializer, GroupsSerializer
 '''
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import User, Group, Entry
+from .models import User, Group, Entry, Notification
 from rest_framework import serializers # Serializers - converts JSON to python object and vice-versa
 
 # RegisterUserSerializer serializes requests to create a new user account
@@ -41,6 +41,11 @@ class EntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entry 
         fields = ['date','name', 'info', 'group']
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entry
+        fields = [ 'info', 'date_to_send']
 # User Serializer to serialize User data
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,3 +84,17 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         return instance
 
         
+class CreateNotificationSerializer(serializers.ModelSerializer):
+   # group = GroupSerializer()
+    class Meta:
+        model = Notification
+        fields = [ 'info', 'date_to_send']
+
+    def create(self, validated_data):
+        notif = Notification.objects.create(
+                info=validated_data['info'],
+                date_to_send=validated_data['date_to_send']
+            )
+        notif.save()
+        #notif.groups.set(validated_data['group'])
+        return notif

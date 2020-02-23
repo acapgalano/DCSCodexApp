@@ -19,8 +19,8 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from .models import User, Group, Entry
-from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer
+from .models import User, Group, Entry, Notification
+from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer, NotificationSerializer, CreateNotificationSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView
 from django.shortcuts import get_object_or_404
 
@@ -55,3 +55,8 @@ class UserUpdate(generics.RetrieveUpdateAPIView):
 	
 	def put(self, request, *args, **kwargs):
 		return self.update(request, *args, **kwargs)
+class NotificationList(ListAPIView):
+	queryset = Notification.objects.all()
+	serializer_class = NotificationSerializer
+class CreateNotification(CreateAPIView):
+	serializer_class = CreateNotificationSerializer
