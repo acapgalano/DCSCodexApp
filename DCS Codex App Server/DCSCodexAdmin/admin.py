@@ -13,8 +13,10 @@ Code History:
 '''
 
 from django.contrib import admin
-from .models import User, Group, Entry
+from .models import User, Group, Entry, Notification, NotificationMessage
 # Registered models: 
 admin.site.register(User)
 admin.site.register(Group)
 admin.site.register(Entry)
+admin.site.register(Notification)
+admin.site.register(NotificationMessage)
