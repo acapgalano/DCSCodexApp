@@ -13,6 +13,8 @@ Code History:
 1/31 - EntrySerializer
 2/08 - UserSerializer, GroupSerializer, UserUpdateSerializer
 2/10 - Updated UserUpdateSerializer, GroupsSerializer
+2/22 - Added NotificationSerializer
+2/26 - Edits to Notification Serializer and add NotificationMessageSerializer
 '''
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Group, Entry, Notification, NotificationMessage
@@ -66,7 +68,6 @@ class GroupsSerializer(serializers.ModelSerializer): # nested serialization for 
 
 #Unserializes requests for update on user information (particularly subscriptions)
 class UserUpdateSerializer(serializers.ModelSerializer):
-    #groups = serializers.StringRelatedField(many=True) # Display subscriptions of user as string 
     groups = GroupsSerializer(many=True)
     class Meta:
         model = User

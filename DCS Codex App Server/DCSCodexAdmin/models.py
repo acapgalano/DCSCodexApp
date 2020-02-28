@@ -12,6 +12,8 @@ Code Histroy:
 1/30 - User model, Group model, Entry model 
 1/31 - Added __str__ method for Group model
 2/08 - Added groups attribute to User to reflect many-to-many relationship with group
+2/22 - Notification
+2/26 - NotificationMessage
 '''
 
 from django.db import models
@@ -57,7 +59,7 @@ class NotificationMessage(models.Model):
 	user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='messages', blank=False, null=False)
 	viewed = models.BooleanField(default=False, blank=False, null=False)
 
-	def visible(self):
+	def visible(self): # Checks to see if notification should be shown/sent
 		if self.notification.date_to_send:
 			print(self.notification.date_to_send)
 			print(timezone.now())

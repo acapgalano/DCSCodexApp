@@ -13,6 +13,8 @@ Code History:
 1/31 - EntryList View 
 2/08 - UserList, GroupList, UserUpdate
 2/10 - AddGroupList, updated UserUpdate
+2/22 - UserNotificationList 
+2/26 - Edits to UserNotificationList, Added notifmsg_detail
 '''
 
 from django.shortcuts import render
@@ -75,9 +77,7 @@ class UserNotificationList(generics.ListAPIView):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def notifmsg_detail(request, pk):
-    """
-    Retrieve, update or delete a code snippet.
-    """
+    #Retrieve, update or delete a notifmsg.
     try:
         notifmsg = NotificationMessage.objects.get(pk=pk)
     except Notification.DoesNotExist:
