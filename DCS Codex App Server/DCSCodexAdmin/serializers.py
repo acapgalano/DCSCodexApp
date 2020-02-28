@@ -93,7 +93,7 @@ class NotificationMessageSerializer(serializers.ModelSerializer):
 
     class Meta: 
         model = NotificationMessage
-        fields = ['notification', 'user', 'viewed']
+        fields = ['id','notification', 'user', 'viewed']
 
     def update(self, instance, validated_data):
         instance.notification = validated_data.get('notification', instance.notification)

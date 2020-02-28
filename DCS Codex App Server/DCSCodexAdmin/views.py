@@ -19,10 +19,11 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from .models import User, Group, Entry, Notification
+from .models import User, Group, Entry, Notification, NotificationMessage
 from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer, NotificationSerializer, NotificationMessageSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
 
 # RegisterUser view used for account registration
 class RegisterUser(CreateAPIView):
@@ -61,12 +62,40 @@ class UserNotificationList(generics.ListAPIView):
 
 	def get_queryset(self):
 		queryset = []
-		print('hello')
 		id = self.kwargs['id']
 		print(id)
 		if id is not None:
 			notifmsgs = User.objects.get(id=id).messages.all()
 			queryset = [notifmsg for notifmsg in notifmsgs if notifmsg.visible()]
+
+			for notifmsg in queryset:
+				NotificationMessage.objects.filter(id=notifmsg.id).update(viewed=True)
+				print(notifmsg.viewed)
 		return queryset
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def notifmsg_detail(request, pk):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        notifmsg = NotificationMessage.objects.get(pk=pk)
+    except Notification.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = NotificationMessageSerializer(notifmsg)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = NotificationMessageSerializer(notifmsg, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        notifmsg.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 

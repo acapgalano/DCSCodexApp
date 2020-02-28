@@ -30,6 +30,7 @@ urlpatterns = [
     path('update/<int:id>', views.UserUpdate.as_view(), name='update'),
     path('addgroup/', views.AddGroupList.as_view(), name='addgroup'),
     path('notifs/<int:id>/', views.UserNotificationList.as_view(), name='notifs'),
+    path('notifmsg/<int:pk>',views.notifmsg_detail),
 ]
 
 
