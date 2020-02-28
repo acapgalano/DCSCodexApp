@@ -16,6 +16,7 @@ Code History:
 Anica Galano | 2/9/2020 - SubscriptionPost, SubscriptionListRoute, SubscriptionListRouteState
 Anica Galano | 2/12/2020 - Additional exception handling for timeout and socket errors
 Anica Galano | 2/13/2020 - Fixed UI elements, added Toast for successful User updates
+Anica Galano | 2/18/2020 - Changed unsubscribe from button to slidable
 
 =================================================================
 File Creation Date: February 9, 2020
@@ -29,10 +30,12 @@ and groups to the existing DCS Codex System through a mobile app.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:dcscodexapp/main_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:dcscodexapp/addsub.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 /*
 SubscriptionPost (Class)
@@ -147,52 +150,56 @@ class SubscriptionListRouteState extends State<SubscriptionListRoute> {
     return ListView.builder(
       itemCount: _groups.length,
       itemBuilder: (BuildContext context, int index) {
-        return Card(
-            elevation: 6.0,
-            margin: new EdgeInsets.symmetric(horizontal: 5.0, vertical: 3.0),
+        return Slidable(
+            delegate: SlidableBehindDelegate(),
+            actionExtentRatio: 0.25,
             child: Container(
               decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(10)),
+                  color: Colors.grey[50]),
               child: ListTile(
                   title: Text(_groups[index]['name']),
                   // Displays the Group's name
-                  trailing: IconButton(
-                    // Button to unsubscribe from Group
-                    icon: Icon(Icons.cancel, color: Colors.grey[600]),
-                    tooltip: 'Click to unsubscribe from Group',
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                                title: Text("Unsubscribe from Group"),
-                                content: Text(
-                                    "Are you sure you want to unsubscribe from this group?"),
-                                actions: [
-                                  FlatButton(
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop(context);
-                                    },
-                                  ),
-                                  FlatButton(
-                                    child: Text('Confirm'),
-                                    onPressed: () {
-                                      _groups.removeAt(index);
-                                      String json = jsonEncode(SubscriptionPost(
-                                          id: 2,
-                                          email: 'testuser@test.com',
-                                          groups: _groups));
-                                      _makePutRequest(json);
-                                      Navigator.of(context).pop();
-                                    },
-                                  )
-                                ]);
-                          });
-                    },
-                  )),
-            ));
+                  ),
+            ),
+          secondaryActions: <Widget>[
+            new IconSlideAction(
+              caption: 'Unsubscribe',
+              color: Colors.red,
+              icon: Icons.cancel,
+              onTap: () {
+
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                          title: Text('Unsubscribe from ${_groups[index]['name']}?'),
+                          content: Text(
+                              "Are you sure you want to unsubscribe from this group?"),
+                          actions: [
+                            FlatButton(
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop(context);
+                              },
+                            ),
+                            FlatButton(
+                              child: Text('Confirm'),
+                              onPressed: () {
+                                _groups.removeAt(index);
+                                String json = jsonEncode(SubscriptionPost(
+                                    id: 2,
+                                    email: 'testuser@test.com',
+                                    groups: _groups));
+                                _makePutRequest(json);
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ]);
+                    });
+              },
+            ),
+          ]
+        );
       },
     );
   }
@@ -203,10 +210,8 @@ class SubscriptionListRouteState extends State<SubscriptionListRoute> {
     return Scaffold(
       appBar: AppBar(
           title: Text('Subscription List'),
-          backgroundColor: Colors.red[900],
-          actions: <Widget>[
-            IconButton(icon: Icon(Icons.list), onPressed: () => print("yay"))
-          ]),
+          backgroundColor: Colors.red[900],),
+      drawer: MainDrawer(),
       body: FutureBuilder(
         future: fetchSubscriptions(),
         builder:
