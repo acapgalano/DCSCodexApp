@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from .models import User, Group, Entry, Notification, NotificationMessage
-from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer, NotificationSerializer, NotificationMessageSerializer
+from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer, NotificationSerializer, NotificationMessageSerializer, NotificationRequestSerializer, NotificationRequestCreateSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
@@ -74,6 +74,23 @@ class UserNotificationList(generics.ListAPIView):
 				NotificationMessage.objects.filter(id=notifmsg.id).update(viewed=True)
 				print(notifmsg.viewed)
 		return queryset
+'''
+@api_view(['POST'])
+def NotifRequestCreateView(request, pk):
+	user = user.objects.get(pk=pk)
+	notifrqst = NotificationRequest(user, data=request.data)
+	if request.method == "POST":
+		serializer = NotificationRequestSerializer(notifrqst)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATE)
+
+'''
+
+class NotifRequestCreateView(CreateAPIView):
+	serializer_class = NotificationRequestCreateSerializer
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def notifmsg_detail(request, pk):

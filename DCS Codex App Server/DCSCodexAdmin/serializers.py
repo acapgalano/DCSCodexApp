@@ -17,7 +17,7 @@ Code History:
 2/26 - Edits to Notification Serializer and add NotificationMessageSerializer
 '''
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import User, Group, Entry, Notification, NotificationMessage
+from .models import User, Group, Entry, Notification, NotificationMessage, NotificationRequest
 from rest_framework import serializers # Serializers - converts JSON to python object and vice-versa
 
 # RegisterUserSerializer serializes requests to create a new user account
@@ -102,3 +102,14 @@ class NotificationMessageSerializer(serializers.ModelSerializer):
         instance.viewed = True
         return instance 
 
+class NotificationRequestSerializer(serializers.ModelSerializer):
+    #not sure what this means
+    class Meta:
+        model = NotificationRequest
+        fields = ['id', 'user', 'group', 'title', 'message', 'purpose', 'date_to_send', 'approved']
+
+class NotificationRequestCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationRequest
+        fields = ['user', 'group', 'title', 'message', 'purpose', 'date_to_send']
+        read_only_fields = ['user']

@@ -31,6 +31,7 @@ urlpatterns = [
     path('addgroup/', views.AddGroupList.as_view(), name='addgroup'),
     path('notifs/<int:id>/', views.UserNotificationList.as_view(), name='notifs'),
     path('notifmsg/<int:pk>',views.notifmsg_detail),
+    path('testcreate/', views.NotifRequestCreateView.as_view()),
 ]
 
 

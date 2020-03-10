@@ -53,7 +53,6 @@ def create_notificationmessage(sender, instance, created, **kwargs):
 		notifmsg = NotificationMessage(notification=instance, user=user, viewed=False)
 		notifmsg.save()
 
-
 class NotificationMessage(models.Model):
 	notification = models.ForeignKey('Notification', on_delete=models.CASCADE, related_name='messages', blank=True, null=True)
 	user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='messages', blank=False, null=False)
@@ -69,3 +68,16 @@ class NotificationMessage(models.Model):
 				return False
 		else:
 			return True
+class NotificationRequest(models.Model):
+	user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='requests')
+	group = models.ForeignKey('Group', on_delete=models.CASCADE)
+	title = models.CharField(max_length=50)
+	message = models.TextField(max_length=100)
+	purpose = models.TextField(max_length=250)
+	date_to_send = models.DateTimeField()
+	approved = models.BooleanField(default=False, blank=False, null=False)
+
+@receiver(signals.post_save, sender=NotificationRequest)
+def create_notification(sender, **kwargs):
+	notification = Notification(title=sender.title, info=sender.message, group=sender.group, date_to_send=sender.date_to_send)
+	notification.save()
