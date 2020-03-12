@@ -78,6 +78,7 @@ class NotificationRequest(models.Model):
 	approved = models.BooleanField(default=False, blank=False, null=False)
 
 @receiver(signals.post_save, sender=NotificationRequest)
-def create_notification(sender, **kwargs):
-	notification = Notification(title=sender.title, info=sender.message, group=sender.group, date_to_send=sender.date_to_send)
-	notification.save()
+def create_notification(sender, instance, **kwargs):
+	if instance.approved: 
+		notification = Notification(title=instance.title, info=instance.message, group=instance.group, date_to_send=instance.date_to_send)
+		notification.save()

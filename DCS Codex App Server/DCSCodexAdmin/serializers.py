@@ -103,13 +103,17 @@ class NotificationMessageSerializer(serializers.ModelSerializer):
         return instance 
 
 class NotificationRequestSerializer(serializers.ModelSerializer):
-    #not sure what this means
+    group = serializers.StringRelatedField()
     class Meta:
         model = NotificationRequest
-        fields = ['id', 'user', 'group', 'title', 'message', 'purpose', 'date_to_send', 'approved']
+        fields = ['id','user', 'group', 'title', 'message', 'purpose', 'date_to_send', 'approved']
 
 class NotificationRequestCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationRequest
         fields = ['user', 'group', 'title', 'message', 'purpose', 'date_to_send']
         read_only_fields = ['user']
+    def to_representation(self, instance):
+        representation = super(NotificationRequestCreateSerializer, self).to_representation(instance)
+        representation['group'] = GroupsSerializer(instance.group, many=False).data
+        return representation 
