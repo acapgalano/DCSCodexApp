@@ -27,6 +27,7 @@ and groups to the existing DCS Codex System through a mobile app.
 import 'package:flutter/material.dart';
 import 'package:dcscodexapp/notifications_page.dart';
 import 'package:dcscodexapp/sublist.dart';
+import 'package:dcscodexapp/notif_request_page.dart';
 
 class MainDrawer extends StatelessWidget {
   @override
@@ -98,6 +99,22 @@ class MainDrawer extends StatelessWidget {
                     builder: (context) => SubscriptionListRoute(),
                   ));
             },
+          ),
+          ListTile(
+            leading: Icon(Icons.add_comment),
+            title: Text(
+              'Notification Requests',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            onTap: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NotificationRequestPageRoute(),
+                  ));
+            }
           ),
           ListTile(
             leading: Icon(Icons.arrow_back),

@@ -219,7 +219,7 @@ class SubscriptionListRouteState extends State<SubscriptionListRoute> {
           if (snapshot.hasData) {
             return _buildRows(snapshot.data.groups);
           }
-          return Scaffold();
+          return Text('No group subsciptions to display.');
         },
       ),
       backgroundColor: Colors.grey[200],
