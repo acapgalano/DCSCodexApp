@@ -106,14 +106,16 @@ class NotificationRequestSerializer(serializers.ModelSerializer):
     group = serializers.StringRelatedField()
     class Meta:
         model = NotificationRequest
-        fields = ['id','user', 'group', 'title', 'message', 'purpose', 'date_to_send', 'approved']
+        fields = ['user', 'group', 'title', 'message', 'purpose', 'date_to_send', 'approved', 'viewed']
 
 class NotificationRequestCreateSerializer(serializers.ModelSerializer):
+    group = serializers.SlugRelatedField(
+        queryset=Group.objects.all(),
+        many=False,
+        read_only=False,
+        slug_field='name'
+     )
     class Meta:
         model = NotificationRequest
-        fields = ['user', 'group', 'title', 'message', 'purpose', 'date_to_send']
-        read_only_fields = ['user']
-    def to_representation(self, instance):
-        representation = super(NotificationRequestCreateSerializer, self).to_representation(instance)
-        representation['group'] = GroupsSerializer(instance.group, many=False).data
-        return representation 
+        fields = ['user', 'group', 'title', 'message', 'purpose', 'date_to_send','approved', 'viewed']
+    

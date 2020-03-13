@@ -21,8 +21,8 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from .models import User, Group, Entry, Notification, NotificationMessage
-from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer, NotificationSerializer, NotificationMessageSerializer, NotificationRequestSerializer, NotificationRequestCreateSerializer
+from .models import User, Group, Entry, Notification, NotificationMessage, NotificationRequest
+from .serializers import RegisterUserSerializer, EntrySerializer, UserSerializer, GroupSerializer, GroupsSerializer, UserUpdateSerializer, NotificationSerializer, NotificationMessageSerializer, NotificationRequestSerializer, NotificationRequestCreateSerializer, NotificationRequestSerializer
 from rest_framework.generics import ListAPIView, CreateAPIView
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
@@ -90,7 +90,7 @@ def NotifRequestCreateView(request, pk):
 class NotifRequestCreateView(CreateAPIView):
 	serializer_class = NotificationRequestCreateSerializer
 	def perform_create(self, serializer):
-		serializer.save(user=self.request.user)
+		serializer.save()
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def notifmsg_detail(request, pk):
@@ -115,4 +115,15 @@ def notifmsg_detail(request, pk):
         notifmsg.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class NotificationRequestsList(generics.ListAPIView):
+	serializer_class = NotificationRequestSerializer
+
+	def get_queryset(self):
+		requests = []
+		id = self.kwargs['id']
+		print(id)
+		if id is not None:
+			requests = User.objects.get(id=id).requests.all()
+		return requests
 

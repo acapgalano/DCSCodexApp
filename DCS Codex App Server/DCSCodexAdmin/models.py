@@ -75,10 +75,12 @@ class NotificationRequest(models.Model):
 	message = models.TextField(max_length=100)
 	purpose = models.TextField(max_length=250)
 	date_to_send = models.DateTimeField()
+	viewed = models.BooleanField(default=False, blank=False, null=False)
 	approved = models.BooleanField(default=False, blank=False, null=False)
 
 @receiver(signals.post_save, sender=NotificationRequest)
 def create_notification(sender, instance, **kwargs):
+	#NotificationRequest.objects.filter(pk=instance.pk).update(viewed=True)
 	if instance.approved: 
 		notification = Notification(title=instance.title, info=instance.message, group=instance.group, date_to_send=instance.date_to_send)
 		notification.save()
